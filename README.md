@@ -69,3 +69,8 @@ npm run dev
 > 除了在 .env 中配置大模型，也可打开 **<http://localhost:3000>**，在"设置"中配置
 > 
 > 注意：设置语言时，需要保持界面语言和内容语言一致
+
+
+## 致谢
+1. [Resume-Matcher](https://github.com/srbhr/Resume-Matcher)
+2. [LINUX DO](https://linux.do/)
