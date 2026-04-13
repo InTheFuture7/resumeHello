@@ -70,6 +70,10 @@ npm run dev
 > 
 > 注意：设置语言时，需要保持界面语言和内容语言一致
 
+## bug fix
+
+2026.04.13：使用 webpack，避免 Turbopack 的异常缓存膨胀
+
 
 ## 致谢
 1. [Resume-Matcher](https://github.com/srbhr/Resume-Matcher)
