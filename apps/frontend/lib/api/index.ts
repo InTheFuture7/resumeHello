@@ -1,4 +1,4 @@
-﻿/**
+/**
  * API Module Exports
  *
  * Centralized exports for all API-related functionality.
@@ -30,23 +30,6 @@ export {
   type ResumeListItem,
 } from './resume';
 
-export {
-  fetchOutreachResumeList,
-  parseJobInfo,
-  generateMatchAnalysis,
-  generateOutreachMessage,
-  fetchOutreachHistory,
-  deleteOutreachRecord,
-  fetchOutreachTemplate,
-  saveOutreachTemplate,
-  type ParsedJobInfo,
-  type OutreachMatchAnalysisV2,
-  type OutreachTemplateData,
-  type OutreachGenerateResult,
-  type OutreachRecord,
-  type OutreachResumeListItem,
-} from './outreach';
-
 // Config operations
 export {
   fetchLlmConfig,
@@ -68,3 +51,20 @@ export {
   type PromptConfig,
   type PromptConfigUpdate,
 } from './config';
+
+export {
+  fetchOutreachResumeList,
+  parseJobInfo,
+  generateMatchAnalysis,
+  generateOutreachMessage,
+  fetchOutreachHistory,
+  deleteOutreachRecord,
+  fetchOutreachTemplate,
+  saveOutreachTemplate,
+  type ParsedJobInfo,
+  type OutreachMatchAnalysisV2,
+  type OutreachTemplateData,
+  type OutreachGenerateResult,
+  type OutreachRecord,
+  type OutreachResumeListItem,
+} from './outreach';

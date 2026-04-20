@@ -70,10 +70,10 @@ npm run dev
 > 
 > 注意：设置语言时，需要保持界面语言和内容语言一致
 
-## bug fix
+## 项目进展
 
-2026.04.13：使用 webpack，避免 Turbopack 的异常缓存膨胀
-
+[bug fix] 2026.04.13：使用 webpack，避免 Turbopack 的异常缓存膨胀
+[add feat] 2026.04.15: 沟通什么？根据职位信息列出需要沟通些什么内容，可能会被问些什么？需要检索公司相关信息。一般的提问角度（搜索本类型岗位的相关面经），比如：针对职位信息中的一些实际问题，设置一些问题。
 
 ## 致谢
 1. [Resume-Matcher](https://github.com/srbhr/Resume-Matcher)

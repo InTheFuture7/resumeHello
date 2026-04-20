@@ -83,13 +83,13 @@ export default function DashboardPage() {
       const status = data.raw_resume?.processing_status || 'pending';
       setProcessingStatus(status as ProcessingStatus);
     } catch (err: unknown) {
+      console.error('Failed to check resume status:', err);
+      // If resume not found (404), clear the stale localStorage
       if (err instanceof Error && err.message.includes('404')) {
-        // If resume not found, clear the stale localStorage quietly
         localStorage.removeItem('master_resume_id');
         setMasterResumeId(null);
         return;
       }
-      console.error('Failed to check resume status:', err);
       setProcessingStatus('failed');
     }
   }, []);
@@ -237,7 +237,7 @@ export default function DashboardPage() {
         return {
           text: t('dashboard.status.checking'),
           icon: <Loader2 className="w-3 h-3 animate-spin" />,
-          color: 'text-gray-500',
+          color: 'text-steel-grey',
         };
       case 'processing':
         return {
@@ -254,7 +254,7 @@ export default function DashboardPage() {
           color: 'text-red-600',
         };
       default:
-        return { text: t('dashboard.status.pending'), icon: null, color: 'text-gray-500' };
+        return { text: t('dashboard.status.pending'), icon: null, color: 'text-steel-grey' };
     }
   };
 
@@ -288,11 +288,11 @@ export default function DashboardPage() {
   };
 
   const totalCards = 1 + tailoredResumes.length + 1;
-  const fillerCount = Math.max(0, (4 - (totalCards % 4)) % 4);
+  const fillerCount = Math.max(0, (5 - (totalCards % 5)) % 5);
   const extraFillerCount = 5;
   // Use Tailwind classes for fillers now that we have them in config or use specific hex if needed
   // Using the hex values from before to maintain exact look, or we could map them to variants
-  const fillerPalette = ['bg-[#E5E5E0]', 'bg-[#D8D8D2]', 'bg-[#CFCFC7]', 'bg-[#E0E0D8]'];
+  const fillerPalette = ['bg-secondary', 'bg-[#D8D8D2]', 'bg-[#CFCFC7]', 'bg-[#E0E0D8]'];
 
   return (
     <div className="space-y-6">
@@ -322,34 +322,35 @@ export default function DashboardPage() {
       {/* Module Selection */}
       <div className="px-4 md:px-8">
         <div className="max-w-[86rem] mx-auto border-t-2 border-black pt-6">
-        <p className="font-mono text-xs uppercase tracking-widest text-gray-500 mb-4">// Modules</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Link href="/outreach" className="group block">
-            <div className="border-2 border-black p-5 flex items-center justify-between bg-canvas hover:bg-primary hover:text-canvas shadow-sw-default hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-none transition-all">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-gray-500 group-hover:text-canvas/70 mb-1">
-                  01
-                </p>
-                <p className="font-serif text-lg font-bold uppercase">Outreach Message</p>
-                <p className="font-mono text-xs mt-1 opacity-60">Cold mail generator</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-gray-500 mb-4">
+            {'// Modules'}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Link href="/outreach" className="group block">
+              <div className="border-2 border-black p-5 flex items-center justify-between bg-canvas hover:bg-primary hover:text-canvas shadow-sw-default hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-none transition-all">
+                <div>
+                  <p className="font-mono text-xs uppercase tracking-widest text-gray-500 group-hover:text-canvas/70 mb-1">
+                    01
+                  </p>
+                  <p className="font-serif text-lg font-bold uppercase">Outreach Message</p>
+                  <p className="font-mono text-xs mt-1 opacity-60">Cold mail generator</p>
+                </div>
+                <ArrowRight className="w-5 h-5 shrink-0 ml-4" />
               </div>
-              <ArrowRight className="w-5 h-5 shrink-0 ml-4" />
-            </div>
-          </Link>
-
-          <Link href="/outreach/history-analysis" className="group block">
-            <div className="border-2 border-black p-5 flex items-center justify-between bg-canvas hover:bg-primary hover:text-canvas shadow-sw-default hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-none transition-all">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-gray-500 group-hover:text-canvas/70 mb-1">
-                  02
-                </p>
-                <p className="font-serif text-lg font-bold uppercase">History Analysis</p>
-                <p className="font-mono text-xs mt-1 opacity-60">Insights &amp; trends</p>
+            </Link>
+            <Link href="/outreach/history-analysis" className="group block">
+              <div className="border-2 border-black p-5 flex items-center justify-between bg-canvas hover:bg-primary hover:text-canvas shadow-sw-default hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-none transition-all">
+                <div>
+                  <p className="font-mono text-xs uppercase tracking-widest text-gray-500 group-hover:text-canvas/70 mb-1">
+                    02
+                  </p>
+                  <p className="font-serif text-lg font-bold uppercase">History Analysis</p>
+                  <p className="font-mono text-xs mt-1 opacity-60">Insights &amp; trends</p>
+                </div>
+                <ArrowRight className="w-5 h-5 shrink-0 ml-4" />
               </div>
-              <ArrowRight className="w-5 h-5 shrink-0 ml-4" />
-            </div>
-          </Link>
-        </div>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -433,6 +434,7 @@ export default function DashboardPage() {
                         className="h-8 w-8 hover:bg-blue-100 hover:text-blue-700 z-10 rounded-none relative"
                         onClick={handleRetryProcessing}
                         disabled={isRetrying}
+                        aria-label={t('dashboard.retryProcessing')}
                         title={t('dashboard.retryProcessing')}
                       >
                         {isRetrying ? (
@@ -505,7 +507,7 @@ export default function DashboardPage() {
                   >
                     <span className="font-mono font-bold">{getMonogram(title)}</span>
                   </div>
-                  <span className="font-mono text-xs text-gray-500 uppercase">
+                  <span className="font-mono text-xs text-steel-grey uppercase">
                     {resume.processing_status}
                   </span>
                 </div>

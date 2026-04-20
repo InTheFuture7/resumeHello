@@ -7,6 +7,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
+ReasoningEffortLiteral = Literal["minimal", "low", "medium", "high"]
+
 _TEXT_VALUE_KEYS = (
     "text",
     "summary",
@@ -758,6 +760,7 @@ class LLMConfigRequest(BaseModel):
     model: str | None = None
     api_key: str | None = None
     api_base: str | None = None
+    reasoning_effort: Literal["minimal", "low", "medium", "high", ""] | None = None
 
 
 class LLMConfigResponse(BaseModel):
@@ -767,6 +770,7 @@ class LLMConfigResponse(BaseModel):
     model: str
     api_key: str  # Masked
     api_base: str | None = None
+    reasoning_effort: ReasoningEffortLiteral | None = None
 
 
 class FeatureConfigRequest(BaseModel):
@@ -781,6 +785,32 @@ class FeatureConfigResponse(BaseModel):
 
     enable_cover_letter: bool = False
     enable_outreach_message: bool = False
+
+
+class FeaturePromptsRequest(BaseModel):
+    """Request to update custom feature prompts.
+
+    ``None`` means "don't change this field". An empty string clears the
+    override — the server persists ``""`` so runtime resolution falls back
+    to the built-in default without the key disappearing from config.json.
+    """
+
+    cover_letter_prompt: str | None = None
+    outreach_message_prompt: str | None = None
+
+
+class FeaturePromptsResponse(BaseModel):
+    """Response for custom feature prompts.
+
+    The ``*_default`` fields expose the built-in prompt strings so the UI
+    can render them as placeholder text without duplicating the content
+    across locales.
+    """
+
+    cover_letter_prompt: str
+    outreach_message_prompt: str
+    cover_letter_default: str
+    outreach_message_default: str
 
 
 class LanguageConfigRequest(BaseModel):

@@ -392,6 +392,93 @@ Guidelines:
 
 Output plain text only. No JSON, no markdown formatting."""
 
+GENERATE_TITLE_PROMPT = """Extract the job title and company name from this job description.
+
+IMPORTANT: Write in {output_language}.
+
+Job Description:
+{job_description}
+
+Rules:
+- Format: "Role @ Company" (e.g., "Senior Frontend Engineer @ Stripe")
+- If the company name is not found, return just the role (e.g., "Senior Frontend Engineer")
+- Maximum 60 characters
+- Use the most specific role title mentioned
+- Do not add any other text, quotes, or formatting
+
+Output the title only, nothing else."""
+
+# Alias for backward compatibility
+RESUME_SCHEMA = RESUME_SCHEMA_EXAMPLE
+
+# Diff-based improvement: outputs targeted changes instead of full resume
+
+DIFF_STRATEGY_INSTRUCTIONS = {
+    "nudge": "Make minimal edits. Only rephrase where there is a clear match. Do not add new bullet points.",
+    "keywords": "Weave in relevant keywords where evidence already exists. You may rephrase bullets but do not add new ones.",
+    "full": "Make targeted adjustments. You may rephrase bullets and add new ones that elaborate on existing work, but do not invent new responsibilities.",
+}
+
+DIFF_IMPROVE_PROMPT = """Given this resume and job description, output a JSON object with targeted changes to better align the resume with the job.
+
+RULES:
+1. Only modify content — never change names, companies, dates, institutions, or degrees
+2. Do not invent skills, metrics, or achievements not supported by the original resume text
+3. Do not add new work entries, education entries, or project entries
+4. {strategy_instruction}
+5. Each change MUST include the original text (copied exactly) so it can be verified
+6. For each change, explain WHY it helps match the job description
+7. Generate all new text in {output_language}
+8. Do not use em dash characters
+9. Keep changes minimal and targeted — do not rewrite content that already aligns well
+
+PATHS you can target:
+- "summary" — the resume summary text
+- "workExperience[i].description[j]" — a specific bullet (i = entry index, j = bullet index)
+- "workExperience[i].description" — append a new bullet (action: "append")
+- "personalProjects[i].description[j]" — a specific project bullet
+- "personalProjects[i].description" — append a new project bullet
+- "additional.technicalSkills" — reorder the skills list (action: "reorder")
+
+Do NOT target: personalInfo, dates/years, company names, education, customSections.
+
+Keywords to emphasize (only if already supported by resume content):
+{job_keywords}
+
+Job Description:
+{job_description}
+
+Original Resume:
+{original_resume}
+
+Output this exact JSON format, nothing else:
+{{
+  "changes": [
+    {{
+      "path": "workExperience[0].description[1]",
+      "action": "replace",
+      "original": "the exact original text at this path",
+      "value": "the improved text",
+      "reason": "why this change helps"
+    }},
+    {{
+      "path": "summary",
+      "action": "replace",
+      "original": "the current summary text",
+      "value": "the improved summary",
+      "reason": "why this change helps"
+    }},
+    {{
+      "path": "additional.technicalSkills",
+      "action": "reorder",
+      "original": null,
+      "value": ["most relevant skill first", "then next", "..."],
+      "reason": "reordered to prioritize JD-relevant skills"
+    }}
+  ],
+  "strategy_notes": "brief summary of the tailoring approach"
+}}"""
+
 OUTREACH_MULTI_STYLE_PROMPT = """Generate three short job outreach message variants based on the candidate resume and target role.
 
 IMPORTANT: Write ALL output in {output_language}.
@@ -516,93 +603,4 @@ Requirements:
 Before outputting your final answer, verify:
 1. Every claim is grounded in the resume or match analysis (no invented facts)
 2. Each sentence adds new information (no semantic repetition, especially with the opening/closing)
-3. The logic flows naturally from one sentence to the next
-Then output only the generated paragraph.
 """
-
-GENERATE_TITLE_PROMPT = """Extract the job title and company name from this job description.
-
-IMPORTANT: Write in {output_language}.
-
-Job Description:
-{job_description}
-
-Rules:
-- Format: "Role @ Company" (e.g., "Senior Frontend Engineer @ Stripe")
-- If the company name is not found, return just the role (e.g., "Senior Frontend Engineer")
-- Maximum 60 characters
-- Use the most specific role title mentioned
-- Do not add any other text, quotes, or formatting
-
-Output the title only, nothing else."""
-
-# Alias for backward compatibility
-RESUME_SCHEMA = RESUME_SCHEMA_EXAMPLE
-
-# Diff-based improvement: outputs targeted changes instead of full resume
-
-DIFF_STRATEGY_INSTRUCTIONS = {
-    "nudge": "Make minimal edits. Only rephrase where there is a clear match. Do not add new bullet points.",
-    "keywords": "Weave in relevant keywords where evidence already exists. You may rephrase bullets but do not add new ones.",
-    "full": "Make targeted adjustments. You may rephrase bullets and add new ones that elaborate on existing work, but do not invent new responsibilities.",
-}
-
-DIFF_IMPROVE_PROMPT = """Given this resume and job description, output a JSON object with targeted changes to better align the resume with the job.
-
-RULES:
-1. Only modify content — never change names, companies, dates, institutions, or degrees
-2. Do not invent skills, metrics, or achievements not supported by the original resume text
-3. Do not add new work entries, education entries, or project entries
-4. {strategy_instruction}
-5. Each change MUST include the original text (copied exactly) so it can be verified
-6. For each change, explain WHY it helps match the job description
-7. Generate all new text in {output_language}
-8. Do not use em dash characters
-9. Keep changes minimal and targeted — do not rewrite content that already aligns well
-
-PATHS you can target:
-- "summary" — the resume summary text
-- "workExperience[i].description[j]" — a specific bullet (i = entry index, j = bullet index)
-- "workExperience[i].description" — append a new bullet (action: "append")
-- "personalProjects[i].description[j]" — a specific project bullet
-- "personalProjects[i].description" — append a new project bullet
-- "additional.technicalSkills" — reorder the skills list (action: "reorder")
-
-Do NOT target: personalInfo, dates/years, company names, education, customSections.
-
-Keywords to emphasize (only if already supported by resume content):
-{job_keywords}
-
-Job Description:
-{job_description}
-
-Original Resume:
-{original_resume}
-
-Output this exact JSON format, nothing else:
-{{
-  "changes": [
-    {{
-      "path": "workExperience[0].description[1]",
-      "action": "replace",
-      "original": "the exact original text at this path",
-      "value": "the improved text",
-      "reason": "why this change helps"
-    }},
-    {{
-      "path": "summary",
-      "action": "replace",
-      "original": "the current summary text",
-      "value": "the improved summary",
-      "reason": "why this change helps"
-    }},
-    {{
-      "path": "additional.technicalSkills",
-      "action": "reorder",
-      "original": null,
-      "value": ["most relevant skill first", "then next", "..."],
-      "reason": "reordered to prioritize JD-relevant skills"
-    }}
-  ],
-  "strategy_notes": "brief summary of the tailoring approach"
-}}"""

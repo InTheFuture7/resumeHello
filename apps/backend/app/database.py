@@ -306,10 +306,7 @@ class Database:
         return doc
 
     def list_all_outreach_records(self) -> list[dict[str, Any]]:
-        """Return all outreach records as raw documents (no sorting or deduplication).
-
-        This is the raw data source for history analysis service logic.
-        """
+        """Return all outreach records as raw documents (no sorting or deduplication)."""
         return list(self.outreach_records.all())
 
     def list_outreach_records(self) -> list[dict[str, Any]]:
